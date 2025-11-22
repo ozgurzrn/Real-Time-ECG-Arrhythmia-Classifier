@@ -50,6 +50,15 @@ CLASSES = {0: 'N (Normal)', 1: 'S (Supraventricular)', 2: 'V (Ventricular)', 3: 
 COLORS = {0: 'green', 1: 'yellow', 2: 'red', 3: 'orange', 4: 'gray'}
 
 def process_and_predict(signal_data, fs=360):
+    # Import signal quality utilities
+    from utils.signal_quality import assess_signal_quality, detect_pacemaker_spikes
+    
+    # Assess overall signal quality
+    quality_metrics = assess_signal_quality(signal_data, fs)
+    
+    # Detect pacemaker
+    pacemaker_info = detect_pacemaker_spikes(signal_data, fs)
+    
     # Denoise
     clean_signal = denoise_signal(signal_data, fs)
     
@@ -72,7 +81,7 @@ def process_and_predict(signal_data, fs=360):
         beat_indices.append((peak - window_samples, peak + window_samples))
         
     if not beats:
-        return [], [], clean_signal, peaks
+        return [], [], clean_signal, peaks, quality_metrics, pacemaker_info
         
     # Batch predict
     beat_tensor = torch.FloatTensor(np.array(beats)).unsqueeze(1).to(device)
@@ -84,16 +93,32 @@ def process_and_predict(signal_data, fs=360):
         
     results = []
     for i, pred in enumerate(preds):
+        confidence = confidences[i]
+        
+        # Flag low confidence predictions
+        needs_review = confidence < 0.6
+        
+        # Check if beat is in pacemaker spike region
+        beat_center = beat_indices[i][0] + window_samples
+        near_pacemaker = False
+        if pacemaker_info['has_pacemaker']:
+            for spike_loc in pacemaker_info['spike_locations']:
+                if abs(beat_center - spike_loc) < window_samples:
+                    near_pacemaker = True
+                    break
+        
         results.append({
             'index': i,
             'prediction': CLASSES[pred],
-            'confidence': confidences[i],
+            'confidence': confidence,
             'beat': beats[i],
             'range': beat_indices[i],
-            'pred_idx': pred
+            'pred_idx': pred,
+            'needs_review': needs_review,
+            'near_pacemaker': near_pacemaker
         })
         
-    return results, clean_signal, peaks
+    return results, clean_signal, peaks, quality_metrics, pacemaker_info
 
 # Sidebar
 st.sidebar.title("❤️ ECG Classifier")
@@ -116,7 +141,29 @@ if uploaded_file:
         
         # Process
         with st.spinner("Analyzing ECG signal..."):
-            results, clean_signal, peaks = process_and_predict(signal_data)
+            results, clean_signal, peaks, quality_metrics, pacemaker_info = process_and_predict(signal_data)
+        
+        # Signal Quality Assessment
+        st.subheader("🔍 Signal Quality Assessment")
+        
+        col_q1, col_q2, col_q3, col_q4 = st.columns(4)
+        
+        with col_q1:
+            st.metric("Overall Quality", quality_metrics['rating'], 
+                     f"{quality_metrics['quality_score']:.0f}/100")
+        with col_q2:
+            st.metric("SNR (dB)", f"{quality_metrics['snr_db']:.1f}",
+                     "Good" if quality_metrics['snr_db'] > 15 else "Low")
+        with col_q3:
+            baseline_status = "⚠️ Yes" if quality_metrics['has_baseline_wander'] else "✓ No"
+            st.metric("Baseline Wander", baseline_status)
+        with col_q4:
+            artifact_level = "Low" if quality_metrics['artifact_score'] < 30 else ("Medium" if quality_metrics['artifact_score'] < 60 else "High")
+            st.metric("Artifacts", artifact_level, f"{quality_metrics['artifact_score']:.0f}/100")
+        
+        # Pacemaker Detection
+        if pacemaker_info['has_pacemaker']:
+            st.warning(f"🔋 **Pacemaker Detected**: {pacemaker_info['spike_count']} spikes found (confidence: {pacemaker_info['confidence']*100:.0f}%)")
         
         # Summary Statistics
         st.subheader("📊 Detection Summary")
@@ -150,6 +197,11 @@ if uploaded_file:
             st.warning(f"⚡ Minor arrhythmia detected: {arrhythmia_count} abnormal beats ({arrhythmia_percentage:.1f}% of total)")
         else:
             st.success("✅ **NORMAL RHYTHM**: No arrhythmias detected")
+        
+        # Note about Q class
+        q_percentage = (class_counts.get(4, 0) / total) * 100
+        if q_percentage > 10:
+            st.info(f"ℹ️ **High Unknown (Q) beats ({q_percentage:.1f}%)**: May indicate pacemaker, artifacts, or unusual heart patterns. Clinical review recommended.")
             
         # Visualization
         st.subheader("ECG Signal Analysis")
@@ -181,10 +233,34 @@ if uploaded_file:
         # Detailed Beat Analysis
         st.subheader("Beat-by-Beat Explanation")
         
+        # Count low-confidence beats
+        low_conf_count = sum(1 for r in results if r['needs_review'])
+        pacemaker_influenced = sum(1 for r in results if r['near_pacemaker'])
+        
+        if low_conf_count > 0:
+            st.warning(f"⚠️ {low_conf_count} beats have low confidence (<60%) and need clinical review")
+        
+        if pacemaker_influenced > 0 and pacemaker_info['has_pacemaker']:
+            st.info(f"🔋 {pacemaker_influenced} beats near pacemaker spikes")
+        
         col1, col2 = st.columns([1, 2])
         
         with col1:
-            selected_beat_idx = st.selectbox("Select Beat to Explain", range(len(results)), format_func=lambda x: f"Beat {x+1}: {results[x]['prediction']}")
+            # Format beat options with confidence indicators
+            beat_options = []
+            for x in range(len(results)):
+                beat_label = f"Beat {x+1}: {results[x]['prediction']}"
+                if results[x]['needs_review']:
+                    beat_label += " ⚠️"
+                if results[x]['near_pacemaker']:
+                    beat_label += " 🔋"
+                beat_options.append(beat_label)
+            
+            selected_beat_idx = st.selectbox(
+                "Select Beat to Explain", 
+                range(len(results)), 
+                format_func=lambda x: beat_options[x]
+            )
             
         if results:
             selected_res = results[selected_beat_idx]
@@ -218,7 +294,17 @@ if uploaded_file:
                 fig_beat.update_layout(title=f"Grad-CAM Explanation for Beat {selected_beat_idx+1} ({selected_res['prediction']})")
                 st.plotly_chart(fig_beat, use_container_width=True)
                 
-                st.info(f"Confidence: {selected_res['confidence']:.2%}")
+                # Detailed confidence info
+                conf_color = "green" if selected_res['confidence'] > 0.8 else ("orange" if selected_res['confidence'] > 0.6 else "red")
+                st.markdown(f"**Confidence:** :{conf_color}[{selected_res['confidence']:.2%}]")
+                
+                # Context flags
+                if selected_res['needs_review']:
+                    st.error("⚠️ **Low Confidence**: This prediction should be reviewed by a clinician")
+                
+                if selected_res['near_pacemaker']:
+                    st.info("🔋 **Near Pacemaker Spike**: Classification may be influenced by pacemaker activity")
+                
                 st.write("The heatmap highlights the regions of the ECG beat that the model focused on to make this prediction.")
         
         # PDF Export
@@ -246,8 +332,84 @@ else:
     
     # Demo button
     if st.button("Load Demo Data"):
-        # Generate synthetic data or load a sample if available
-        t = np.linspace(0, 10, 3600)
-        ecg = np.sin(2 * np.pi * 1 * t) + 0.5 * np.sin(2 * np.pi * 5 * t) # Dummy
-        # In real scenario, load one of the downloaded files
-        st.warning("Demo mode using synthetic data. Upload real data for accurate results.")
+        # Load sample_input.csv if it exists
+        import os
+        demo_file = "sample_input.csv"
+        if os.path.exists(demo_file):
+            try:
+                df = pd.read_csv(demo_file)
+                if df.shape[1] == 1:
+                    signal_data = df.iloc[:, 0].values
+                else:
+                    signal_data = df.iloc[:, 1].values
+                
+                st.success("Demo data loaded successfully!")
+                
+                # Process
+                with st.spinner("Analyzing ECG signal..."):
+                    results, clean_signal, peaks, quality_metrics, pacemaker_info = process_and_predict(signal_data)
+                
+                # Summary Statistics
+                st.subheader("📊 Detection Summary")
+                
+                # Count each class
+                from collections import Counter
+                class_counts = Counter([r['pred_idx'] for r in results])
+                total = len(results)
+                
+                # Create columns for metrics
+                col1, col2, col3, col4, col5 = st.columns(5)
+                
+                with col1:
+                    st.metric("Normal (N)", f"{class_counts.get(0, 0)}", f"{class_counts.get(0, 0)/total*100:.1f}%")
+                with col2:
+                    st.metric("Supraventricular (S)", f"{class_counts.get(1, 0)}", f"{class_counts.get(1, 0)/total*100:.1f}%")
+                with col3:
+                    st.metric("Ventricular (V)", f"{class_counts.get(2, 0)}", f"{class_counts.get(2, 0)/total*100:.1f}%")
+                with col4:
+                    st.metric("Fusion (F)", f"{class_counts.get(3, 0)}", f"{class_counts.get(3, 0)/total*100:.1f}%")
+                with col5:
+                    st.metric("Unknown (Q)", f"{class_counts.get(4, 0)}", f"{class_counts.get(4, 0)/total*100:.1f}%")
+                
+                # Arrhythmia Alert
+                arrhythmia_count = class_counts.get(1, 0) + class_counts.get(2, 0) + class_counts.get(3, 0)
+                arrhythmia_percentage = (arrhythmia_count / total) * 100
+                
+                if arrhythmia_percentage > 5:
+                    st.error(f"⚠️ **ARRHYTHMIA DETECTED**: {arrhythmia_count} abnormal beats ({arrhythmia_percentage:.1f}% of total)")
+                elif arrhythmia_percentage > 0:
+                    st.warning(f"⚡ Minor arrhythmia detected: {arrhythmia_count} abnormal beats ({arrhythmia_percentage:.1f}% of total)")
+                else:
+                    st.success("✅ **NORMAL RHYTHM**: No arrhythmias detected")
+                    
+                # Note about Q class
+                q_percentage = (class_counts.get(4, 0) / total) * 100
+                if q_percentage > 10:
+                    st.info(f"ℹ️ **High Unknown (Q) beats ({q_percentage:.1f}%)**: May indicate pacemaker, artifacts, or unusual heart patterns. Clinical review recommended.")
+                
+                # Visualization (same as before)
+                st.subheader("ECG Signal Analysis")
+                
+                display_length = min(3600, len(clean_signal))
+                display_signal = clean_signal[:display_length]
+                display_results = [r for r in results if r['range'][1] <= display_length]
+                
+                st.info(f"Displaying first {display_length/360:.1f} seconds ({len(display_results)} beats). Total: {len(results)} beats classified.")
+                
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(y=display_signal, mode='lines', name='ECG Signal', line=dict(color='black', width=1)))
+                
+                for res in display_results:
+                    start, end = res['range']
+                    pred_class = res['pred_idx']
+                    color = COLORS[pred_class]
+                    fig.add_vrect(x0=start, x1=end, fillcolor=color, opacity=0.2, layer="below", line_width=0,
+                                  annotation_text=res['prediction'][0], annotation_position="top left")
+                
+                fig.update_layout(height=400)
+                st.plotly_chart(fig, use_container_width=True)
+                
+            except Exception as e:
+                st.error(f"Error loading demo data: {e}")
+        else:
+            st.warning("Demo file 'sample_input.csv' not found. Please upload your own ECG data.")
