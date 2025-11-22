@@ -1,0 +1,10 @@
+======================================================================
+ECG Arrhythmia Classifier - Comprehensive Test Suite
+======================================================================
+Traceback (most recent call last):
+  File "C:\Users\90546\Desktop\Real-Time ECG Arrhythmia Classifier\test_classifier.py", line 146, in <module>
+    print("\n\U0001f4c1 Creating test samples...")
+  File "C:\Users\90546\AppData\Local\Programs\Python\Python311\Lib\encodings\cp1254.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f4c1' in position 2: character maps to <undefined>

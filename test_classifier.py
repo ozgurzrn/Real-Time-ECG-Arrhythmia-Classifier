@@ -3,6 +3,11 @@ Comprehensive test suite for ECG arrhythmia classifier.
 Tests on various MIT-BIH records with known characteristics.
 """
 
+# Force UTF-8 encoding for emoji support on Windows
+import sys
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 import pandas as pd
 import numpy as np
 import wfdb
@@ -71,7 +76,7 @@ def test_classifier_on_record(csv_path, record_num, description, expected_class)
     signal_data = df.iloc[:, 0].values
     
     # Process
-    results, clean_signal, peaks, quality_metrics, pacemaker_info = process_and_predict(signal_data)
+    results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data)
     
     # Analyze results
     from collections import Counter
@@ -98,6 +103,15 @@ def test_classifier_on_record(csv_path, record_num, description, expected_class)
         print(f"\n🔋 Pacemaker: YES ({pacemaker_info['spike_count']} spikes, {pacemaker_info['confidence']*100:.0f}% confidence)")
     else:
         print(f"\n🔋 Pacemaker: NO")
+    
+    # Rhythm Analysis
+    if rhythm_metrics['status'] == 'Complete':
+        print(f"\n💓 Rhythm Analysis:")
+        print(f"  Heart Rate: {rhythm_metrics['heart_rate_bpm']:.0f} bpm ({rhythm_metrics['rate_classification']})")
+        print(f"  Regularity: {'Irregular' if rhythm_metrics['is_irregular'] else 'Regular'} (CV={rhythm_metrics['rr_variability_cv']:.2f})")
+        print(f"  Pattern: {rhythm_metrics['rhythm_pattern']}")
+        if rhythm_metrics['interpretation']:
+            print(f"  Clinical: {' | '.join(rhythm_metrics['interpretation'])}")
     
     # Confidence analysis
     confidences = [r['confidence'] for r in results]
