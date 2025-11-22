@@ -52,6 +52,7 @@ COLORS = {0: 'green', 1: 'yellow', 2: 'red', 3: 'orange', 4: 'gray'}
 def process_and_predict(signal_data, fs=360):
     # Import signal quality utilities
     from utils.signal_quality import assess_signal_quality, detect_pacemaker_spikes
+    from utils.rhythm_analysis import comprehensive_rhythm_analysis
     
     # Assess overall signal quality
     quality_metrics = assess_signal_quality(signal_data, fs)
@@ -65,6 +66,9 @@ def process_and_predict(signal_data, fs=360):
     # Detect R-peaks (simple method for demo if no annotations)
     # In a real app, we might use a better detector like Pan-Tompkins
     peaks, _ = find_peaks(clean_signal, distance=fs*0.4, height=np.mean(clean_signal))
+    
+    # Rhythm analysis
+    rhythm_metrics = comprehensive_rhythm_analysis(peaks, fs)
     
     beats = []
     beat_indices = []
@@ -81,7 +85,7 @@ def process_and_predict(signal_data, fs=360):
         beat_indices.append((peak - window_samples, peak + window_samples))
         
     if not beats:
-        return [], [], clean_signal, peaks, quality_metrics, pacemaker_info
+        return [], [], clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics
         
     # Batch predict
     beat_tensor = torch.FloatTensor(np.array(beats)).unsqueeze(1).to(device)
@@ -97,6 +101,14 @@ def process_and_predict(signal_data, fs=360):
         
         # Flag low confidence predictions
         needs_review = confidence < 0.6
+        
+        # Rhythm-based adjustment hint
+        rhythm_flag = ""
+        if rhythm_metrics['status'] == 'Complete':
+            if rhythm_metrics['is_irregular'] and pred == 0:  # Normal beat in irregular rhythm
+                rhythm_flag = "irregular_rhythm"
+            if rhythm_metrics['rate_classification'] != 'Normal':
+                rhythm_flag = f"{rhythm_flag}_{rhythm_metrics['rate_classification']}".strip('_')
         
         # Check if beat is in pacemaker spike region
         beat_center = beat_indices[i][0] + window_samples
@@ -115,10 +127,11 @@ def process_and_predict(signal_data, fs=360):
             'range': beat_indices[i],
             'pred_idx': pred,
             'needs_review': needs_review,
-            'near_pacemaker': near_pacemaker
+            'near_pacemaker': near_pacemaker,
+            'rhythm_context': rhythm_flag
         })
         
-    return results, clean_signal, peaks, quality_metrics, pacemaker_info
+    return results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics
 
 # Sidebar
 st.sidebar.title("❤️ ECG Classifier")
@@ -141,7 +154,7 @@ if uploaded_file:
         
         # Process
         with st.spinner("Analyzing ECG signal..."):
-            results, clean_signal, peaks, quality_metrics, pacemaker_info = process_and_predict(signal_data)
+            results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data)
         
         # Signal Quality Assessment
         st.subheader("🔍 Signal Quality Assessment")
@@ -160,6 +173,37 @@ if uploaded_file:
         with col_q4:
             artifact_level = "Low" if quality_metrics['artifact_score'] < 30 else ("Medium" if quality_metrics['artifact_score'] < 60 else "High")
             st.metric("Artifacts", artifact_level, f"{quality_metrics['artifact_score']:.0f}/100")
+        
+        # Rhythm Analysis
+        if rhythm_metrics['status'] == 'Complete':
+            st.subheader("💓 Rhythm Analysis")
+            
+            col_r1, col_r2, col_r3, col_r4 = st.columns(4)
+            
+            with col_r1:
+                hr_color = "🟢" if 60 <= rhythm_metrics['heart_rate_bpm'] <= 100 else "🔴"
+                st.metric("Heart Rate", f"{rhythm_metrics['heart_rate_bpm']:.0f} bpm", rhythm_metrics['rate_classification'])
+            
+            with col_r2:
+                regularity = "Regular" if not rhythm_metrics['is_irregular'] else "Irregular"
+                st.metric("Rhythm", regularity, f"CV: {rhythm_metrics['rr_variability_cv']:.2f}")
+            
+            with col_r3:
+                st.metric("RR Interval", f"{rhythm_metrics['rr_mean_ms']:.0f} ms", 
+                         f"±{rhythm_metrics['rr_std_ms']:.0f} ms")
+            
+            with col_r4:
+                st.metric("Pattern", rhythm_metrics['rhythm_pattern'].split('(')[0].strip())
+            
+            # Rhythm interpretation
+            if rhythm_metrics['interpretation']:
+                interpret_text = " • ".join(rhythm_metrics['interpretation'])
+                if rhythm_metrics['is_irregular']:
+                    st.warning(f"⚡ {interpret_text}")
+                elif rhythm_metrics['rate_classification'] != 'Normal':
+                    st.info(f"ℹ️ {interpret_text}")
+                else:
+                    st.success(f"✅ {interpret_text}")
         
         # Pacemaker Detection
         if pacemaker_info['has_pacemaker']:
@@ -347,7 +391,7 @@ else:
                 
                 # Process
                 with st.spinner("Analyzing ECG signal..."):
-                    results, clean_signal, peaks, quality_metrics, pacemaker_info = process_and_predict(signal_data)
+                    results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data)
                 
                 # Summary Statistics
                 st.subheader("📊 Detection Summary")

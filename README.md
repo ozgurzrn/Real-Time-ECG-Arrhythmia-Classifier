@@ -65,6 +65,22 @@ streamlit run src/app.py
 - **Supraventricular (S)**: F1 = 0.92 (Precision: 0.92, Recall: 0.91)
 - **Fusion (F)**: F1 = 0.83 (Precision: 0.82, Recall: 0.84)
 
+### Validation Testing
+
+The model was tested on 11 diverse MIT-BIH records representing different patient conditions:
+
+| Test Category | Accuracy | Notes |
+|---------------|----------|-------|
+| Normal Rhythm | 100% (3/3) | Excellent |
+| Paced Rhythm | 100% (2/2) | Excellent pacemaker detection |
+| Ventricular Arrhythmia | Needs improvement | See [validation report](VALIDATION_REPORT.md) |
+| Supraventricular | Needs improvement | Class imbalance in training data |
+
+**Key Findings:**
+- ✅ Excellent for normal rhythm screening and pacemaker detection
+- ⚠️ Requires clinical review for specific arrhythmia subtypes
+- 📊 Detailed analysis: [VALIDATION_REPORT.md](VALIDATION_REPORT.md)
+
 ---
 
 ## 🏗️ Architecture
