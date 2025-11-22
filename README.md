@@ -11,7 +11,7 @@ A deep learning-based application for classifying ECG arrhythmias with **Explain
 
 ## ✨ Features
 
-- **🎯 High Accuracy**: 97.87% test accuracy with ResNet1D architecture
+- **🎯 High Accuracy**: 98.98% test accuracy with ResNet1D architecture
 - **🔍 Explainable AI**: Grad-CAM heatmaps show which ECG regions influenced predictions
 - **📊 Real-Time Analysis**: Instant classification of 5 AAMI arrhythmia types:
   - **N**: Normal
@@ -53,17 +53,17 @@ streamlit run src/app.py
 
 | Metric | Score |
 |--------|-------|
-| **Accuracy** | 97.87% |
-| **Precision (Weighted)** | 0.98 |
-| **Recall (Weighted)** | 0.98 |
-| **F1-Score (Weighted)** | 0.98 |
+| **Accuracy** | 98.98% |
+| **Precision (Weighted)** | 0.99 |
+| **Recall (Weighted)** | 0.99 |
+| **F1-Score (Weighted)** | 0.99 |
 
 ### Class-Specific Performance
-- **Normal (N)**: F1 = 0.99 (Precision: 1.00, Recall: 0.98)
-- **Ventricular (V)**: F1 = 0.95 (Precision: 0.94, Recall: 0.97)
-- **Unknown (Q)**: F1 = 0.97 (Precision: 0.95, Recall: 0.99)
-- **Supraventricular (S)**: F1 = 0.84 (Precision: 0.76, Recall: 0.93)
-- **Fusion (F)**: F1 = 0.82 (Precision: 0.77, Recall: 0.88)
+- **Normal (N)**: F1 = 1.00 (Precision: 1.00, Recall: 0.99)
+- **Ventricular (V)**: F1 = 0.98 (Precision: 0.98, Recall: 0.97)
+- **Unknown (Q)**: F1 = 0.99 (Precision: 0.98, Recall: 0.99)
+- **Supraventricular (S)**: F1 = 0.92 (Precision: 0.92, Recall: 0.91)
+- **Fusion (F)**: F1 = 0.83 (Precision: 0.82, Recall: 0.84)
 
 ---
 
