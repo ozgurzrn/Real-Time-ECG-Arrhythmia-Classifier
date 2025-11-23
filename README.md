@@ -4,7 +4,7 @@
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Docker](https://img.shields.io/badge/Docker-Available-blue?logo=docker&logoColor=white)](Dockerfile)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](demo_notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ozgurzrn/Real-Time-ECG-Arrhythmia-Classifier/blob/main/demo_notebook.ipynb)
 
 A production-grade deep learning system for real-time ECG arrhythmia detection, featuring explainable AI (Grad-CAM), signal quality assessment, and rigorous patient-level validation.
 
@@ -46,7 +46,7 @@ In this project, I initially achieved **99% test accuracy** using a standard ran
 
 ### Option 1: Google Colab (No Installation)
 Try the model instantly in your browser:
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](demo_notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ozgurzrn/Real-Time-ECG-Arrhythmia-Classifier/blob/main/demo_notebook.ipynb)
 
 ### Option 2: Docker (Recommended)
 ```bash
