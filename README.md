@@ -29,7 +29,9 @@ In this project, I initially achieved **99% test accuracy** using a standard ran
 ## ✨ Features
 
 *   **Deep Learning Model**: ResNet1D architecture optimized for time-series classification.
-*   **Real-Time Analysis**: Processes ECG signals in <50ms.
+*   **Real-Time Analysis**: 
+    *   **Batch Mode**: High-precision zero-phase filtering (research).
+    *   **Streaming Mode**: Causal SOS filtering & online normalization (deployment).
 *   **Explainable AI**: Grad-CAM heatmaps show exactly *why* the model made a prediction.
 *   **Clinical Metrics**:
     *   **Pacemaker Detection** (100% accuracy)

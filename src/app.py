@@ -8,6 +8,7 @@ from scipy.signal import find_peaks
 from model.model import ResNet1D
 from utils.gradcam import GradCAM
 from data.preprocess import denoise_signal
+from data.streaming import RealTimePipeline
 from datetime import datetime
 
 # Page Config
@@ -49,7 +50,7 @@ model, device = load_model()
 CLASSES = {0: 'N (Normal)', 1: 'S (Supraventricular)', 2: 'V (Ventricular)', 3: 'F (Fusion)', 4: 'Q (Unknown)'}
 COLORS = {0: 'green', 1: 'yellow', 2: 'red', 3: 'orange', 4: 'gray'}
 
-def process_and_predict(signal_data, fs=360):
+def process_and_predict(signal_data, fs=360, use_streaming=False):
     # Import signal quality utilities
     from utils.signal_quality import assess_signal_quality, detect_pacemaker_spikes
     from utils.rhythm_analysis import comprehensive_rhythm_analysis
@@ -61,7 +62,17 @@ def process_and_predict(signal_data, fs=360):
     pacemaker_info = detect_pacemaker_spikes(signal_data, fs)
     
     # Denoise
-    clean_signal = denoise_signal(signal_data, fs)
+    if use_streaming:
+        # Use Causal Streaming Pipeline
+        pipeline = RealTimePipeline(fs)
+        # Process entire signal chunk-by-chunk to simulate streaming
+        # In a real app, this would happen sample-by-sample
+        clean_signal = pipeline.process(signal_data)
+        # Note: Streaming pipeline already normalizes, but we might need to adjust scale
+        # for visualization if the normalizer hasn't converged yet.
+    else:
+        # Use Non-Causal Batch Processing (Original)
+        clean_signal = denoise_signal(signal_data, fs)
     
     # Detect R-peaks (simple method for demo if no annotations)
     # In a real app, we might use a better detector like Pan-Tompkins
@@ -80,7 +91,12 @@ def process_and_predict(signal_data, fs=360):
             
         beat = clean_signal[peak - window_samples : peak + window_samples]
         # Normalize
-        beat = (beat - np.mean(beat)) / (np.std(beat) + 1e-6)
+        if use_streaming:
+            # Signal is already normalized by StreamNormalizer
+            beat = beat 
+        else:
+            # Batch normalization
+            beat = (beat - np.mean(beat)) / (np.std(beat) + 1e-6)
         beats.append(beat)
         beat_indices.append((peak - window_samples, peak + window_samples))
         
@@ -138,6 +154,10 @@ st.sidebar.title("❤️ ECG Classifier")
 st.sidebar.info("Upload an ECG recording to detect arrhythmias.")
 uploaded_file = st.sidebar.file_uploader("Upload CSV (Signal Column)", type=['csv', 'txt'])
 
+# Real-Time Mode Toggle
+use_streaming = st.sidebar.checkbox("⚡ Enable True Real-Time (Causal)", 
+                                  help="Use causal filtering (SOS) and online normalization. Simulates live streaming behavior.")
+
 # Main Content
 st.title("Real-Time ECG Arrhythmia Detection")
 
@@ -154,7 +174,7 @@ if uploaded_file:
         
         # Process
         with st.spinner("Analyzing ECG signal..."):
-            results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data)
+            results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data, use_streaming=use_streaming)
         
         # Signal Quality Assessment
         st.subheader("🔍 Signal Quality Assessment")
@@ -391,7 +411,7 @@ else:
                 
                 # Process
                 with st.spinner("Analyzing ECG signal..."):
-                    results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data)
+                    results, clean_signal, peaks, quality_metrics, pacemaker_info, rhythm_metrics = process_and_predict(signal_data, use_streaming=use_streaming)
                 
                 # Summary Statistics
                 st.subheader("📊 Detection Summary")
