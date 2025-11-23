@@ -44,7 +44,13 @@ def train_model(num_epochs=20, batch_size=64, learning_rate=0.001):
     
     # Initialize model
     model = ResNet1D(num_classes=5).to(device)
-    criterion = nn.CrossEntropyLoss()
+    
+    # Class weights to address imbalance - give arrhythmias higher importance
+    # Order: N, S, V, F, Q
+    class_weights = torch.tensor([1.0, 5.0, 5.0, 3.0, 2.0]).to(device)
+    print(f"Using class weights: N=1.0, S=5.0, V=5.0, F=3.0, Q=2.0")
+    
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     
     best_acc = 0.0
