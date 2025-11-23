@@ -64,6 +64,24 @@ streamlit run src/app.py
 
 ---
 
+## 🔬 Scientific Validity & Limitations
+
+**Transparent Engineering Note**: This project is designed as a **Hybrid System** to address common deep learning pitfalls in ECG analysis.
+
+1.  **Beat vs. Rhythm**: 
+    *   The **Deep Learning Model (ResNet1D)** looks at a 0.6s window to classify **Beat Morphology** (Shape). It detects *what* the beat is (e.g., PVC, LBBB).
+    *   The **Statistical Module** looks at 10s+ of data to classify **Rhythm** (Time). It detects *how* the beats occur (e.g., AFib, Bigeminy) using RR-interval variability.
+    *   *Critique Addressed*: A 0.6s window cannot detect AFib alone. We use the rhythm module for that.
+
+2.  **Real-Time Causality**:
+    *   This system uses `filtfilt` (zero-phase filtering) for optimal signal quality.
+    *   *Constraint*: This requires **Buffered Processing** (analyzing 10s chunks at a time) rather than sample-by-sample streaming. For a true implantable device, causal filtering (`sosfilt`) would be required.
+
+3.  **Patient Generalization**:
+    *   We explicitly validate on **unseen patients** (70% accuracy) rather than reporting the misleading 99% random-split accuracy. This is a more honest metric for clinical utility.
+
+---
+
 ## 📊 Model Performance
 
 | Metric | Value | Notes |
