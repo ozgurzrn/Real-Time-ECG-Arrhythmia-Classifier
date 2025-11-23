@@ -17,10 +17,18 @@ def denoise_signal(data, fs):
     y = signal.filtfilt(b, a, data)
     return y
 
-def segment_beats(signal_data, annotations, fs, window_size=0.6):
+def segment_beats(signal_data, annotations, fs, window_size=0.6, normalize_beats=True):
     """
     Segments the ECG signal into beats based on R-peak annotations.
     Returns a list of beats and their corresponding labels.
+    
+    Args:
+        signal_data: ECG signal (may already be normalized at recording level)
+        annotations: R-peak annotations
+        fs: Sampling frequency
+        window_size: Window size in seconds
+        normalize_beats: If True, normalize each beat individually
+                        If False, skip normalization (recording already normalized)
     """
     beats = []
     labels = []
@@ -37,17 +45,24 @@ def segment_beats(signal_data, annotations, fs, window_size=0.6):
             
         beat = signal_data[sample_idx - window_samples : sample_idx + window_samples]
         
-        # Normalize beat
-        beat = (beat - np.mean(beat)) / (np.std(beat) + 1e-6)
+        # Normalize beat only if not already normalized at recording level
+        if normalize_beats:
+            beat = (beat - np.mean(beat)) / (np.std(beat) + 1e-6)
         
         beats.append(beat)
         labels.append(label)
         
     return np.array(beats), np.array(labels)
 
-def process_record(record_name, data_dir='data/raw'):
+def process_record(record_name, data_dir='data/raw', patient_norm=True):
     """
     Process a single record: load, denoise, segment.
+    
+    Args:
+        record_name: Name of the record
+        data_dir: Directory containing raw data
+        patient_norm: If True, normalize entire recording before segmentation (recommended)
+                     If False, normalize each beat independently (old behavior)
     """
     record_path = os.path.join(data_dir, record_name)
     record = wfdb.rdrecord(record_path)
@@ -60,8 +75,12 @@ def process_record(record_name, data_dir='data/raw'):
     # Denoise
     clean_signal = denoise_signal(ecg_signal, fs)
     
-    # Segment
-    beats, labels = segment_beats(clean_signal, annotation, fs)
+    # Patient-specific normalization: Normalize ENTIRE recording
+    if patient_norm:
+        clean_signal = (clean_signal - np.mean(clean_signal)) / (np.std(clean_signal) + 1e-6)
+    
+    # Segment (will NOT normalize beats if patient_norm=True)
+    beats, labels = segment_beats(clean_signal, annotation, fs, normalize_beats=(not patient_norm))
     
     return beats, labels
 
