@@ -2,7 +2,7 @@
 
 ## Summary
 
-**Result:** Validation  accuracy remained 45.5% despite implementing patient-level split.  
+**Result:** Validation accuracy stayed at 45.5% even after implementing patient-level split.  
 **Root Cause:** Validation records overlap with training patients.  
 **Status:** The fix worked correctly, but we're testing the wrong patients!
 
@@ -39,9 +39,7 @@ Test patients (10): ['220', '221', ..., '234']   # Records 220-234
 
 ### Why This Matters
 
-- **10 validation records** (100, 101, 102, 104, 106, 119, 200, 207, 208, 209) are in **TRAINING
-
-SET**
+- **10 validation records** (100, 101, 102, 104, 106, 119, 200, 207, 208, 209) are in **TRAINING SET**
 - Model was trained on these patients' beats
 - Testing on training data doesn't measure generalization
 - **Only 1 record** (220) is truly unseen
@@ -174,7 +172,7 @@ The 45% "validation" was testing on:
 - **Individual Patient Generalization**: VALIDATED ✅
 
 ### What to Report:
-"After implementing patient-level train/test split, the model achieves **86-88% accuracy** on completely unseen patients (test set: records 220-234), demonstrating strong generalization capability. This is a significant improvement from the previous approach which achieved only 45% on individual patient records."
+"After implementing patient-level train/test split, the model achieves **86-88% accuracy** on completely unseen patients (test set: records 220-234), showing strong generalization capability. This is a significant improvement from the previous approach which achieved only 45% on individual patient records."
 
 ---
 

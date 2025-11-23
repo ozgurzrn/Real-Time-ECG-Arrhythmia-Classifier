@@ -14,13 +14,13 @@ A production-grade deep learning system for real-time ECG arrhythmia detection, 
 
 **Most ML projects fail in the real world because they test on the same patients they trained on.**
 
-In this project, I initially achieved **99% test accuracy** using a standard random split. However, when I validated on individual patient records, accuracy dropped to **45%**.
+In this project, I initially got **99% test accuracy** using a standard random split. But when I validated on individual patient records, accuracy dropped to **45%**.
 
-**Root Cause**: The model was memorizing patient-specific ECG morphology rather than learning arrhythmia features.
-**Solution**: Implemented a **Patient-Level Train/Test Split** (ensuring patients in the test set are completely unseen during training).
+**Root Cause**: The model was memorizing patient-specific ECG patterns instead of learning arrhythmia features.
+**Solution**: I used a **Patient-Level Train/Test Split** (ensuring patients in the test set are completely unseen during training).
 **Result**: 
 - **Validation Accuracy**: Improved from 45% → **70%** on unseen patients.
-- **Generalization**: Proven robust on external data (PTB Database).
+- **Generalization**: Shown to be robust on external data (PTB Database).
 
 *See [CRITICAL_FINDING.md](CRITICAL_FINDING.md) for the full engineering analysis.*
 
@@ -68,7 +68,7 @@ streamlit run src/app.py
 
 ## 🔬 Scientific Validity & Limitations
 
-**Transparent Engineering Note**: This project is designed as a **Hybrid System** to address common deep learning pitfalls in ECG analysis.
+**Transparent Engineering Note**: This project is designed as a **Hybrid System** to fix common deep learning pitfalls in ECG analysis.
 
 1.  **Beat vs. Rhythm**: 
     *   The **Deep Learning Model (ResNet1D)** looks at a 0.6s window to classify **Beat Morphology** (Shape). It detects *what* the beat is (e.g., PVC, LBBB).
@@ -76,7 +76,7 @@ streamlit run src/app.py
     *   *Critique Addressed*: A 0.6s window cannot detect AFib alone. We use the rhythm module for that.
 
 2.  **Real-Time Causality**:
-    *   This system uses `filtfilt` (zero-phase filtering) for optimal signal quality.
+    *   This system uses `filtfilt` (zero-phase filtering) for best signal quality.
     *   *Constraint*: This requires **Buffered Processing** (analyzing 10s chunks at a time) rather than sample-by-sample streaming. For a true implantable device, causal filtering (`sosfilt`) would be required.
 
 3.  **Patient Generalization**:
@@ -92,7 +92,7 @@ streamlit run src/app.py
 | **Validation Accuracy** | **70.0%** | On 10 unseen patients (Real-world scenario) |
 | **Inference Time** | **<50ms** | Per 10-second segment |
 
-> **Note**: The discrepancy between test and validation accuracy highlights the challenge of **inter-patient variability**. While the model excels at classifying beats from known populations, generalizing to completely new patients remains a known challenge in ECG analysis. See [VALIDATION_REPORT.md](VALIDATION_REPORT.md) for a detailed analysis.
+> **Note**: The difference between test and validation accuracy highlights the challenge of **inter-patient variability**. While the model excels at classifying beats from known populations, generalizing to completely new patients remains a known challenge in ECG analysis. See [VALIDATION_REPORT.md](VALIDATION_REPORT.md) for a detailed analysis.
 
 ---
 

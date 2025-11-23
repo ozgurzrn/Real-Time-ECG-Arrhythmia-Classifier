@@ -38,13 +38,13 @@
 
 ### Strengths
 1. **High Confidence**: Average confidence >98% across all predictions
-2. **Normal Detection**: Perfect accuracy for predominantly normal rhythms  
+2. **Normal Detection**: Perfect accuracy for mostly normal rhythms  
 3. **Pacemaker Detection**: 100% accuracy with excellent spike detection algorithm
 4. **Signal Quality**: Correctly identifies poor quality signals
 
 ### Weaknesses
 1. **Ventricular Arrhythmia**: Struggling to detect PVCs and ventricular patterns
-2. **Supraventricular**: Cannot distinguish atrial fibrillation/flutter from normal
+2. **Supraventricular**: Cannot tell atrial fibrillation/flutter from normal
 3. **Limited Segments**: Only testing first 30 seconds of each record
 4. **Class Imbalance Effect**: Model biased toward Normal class (most common in training)
 
@@ -60,12 +60,12 @@
 
 2. **Beat-Level vs. Rhythm-Level**:
    - Model classifies individual beats
-   - Some arrhythmias (e.g., atrial fib) are rhythm disorders, not beat morphology changes
+   - Some arrhythmias (e.g., atrial fib) are rhythm disorders, not beat shape changes
    - Single-beat analysis may miss rhythm patterns
 
 3. **Preprocessing Normalization**:
    - Each beat normalized independently
-   - Loses amplitude information that helps distinguish V from N
+   - Loses amplitude information that helps tell V from N
 
 4. **Test Methodology**:
    - Only first 30 seconds tested
@@ -76,7 +76,7 @@
 ### Immediate (No Retraining)
 1. ✅ **Add Rhythm Analysis**: Detect heart rate variability patterns
 2. ✅ **RR Interval Analysis**: Irregular RR intervals suggest atrial fib
-3. ✅ **Beat Clustering**: Group similar morphologies
+3. ✅ **Beat Clustering**: Group similar shapes
 
 ### Short-Term (Minor Retraining)
 1. **Class Weighting**: Increase loss weight for V and S classes

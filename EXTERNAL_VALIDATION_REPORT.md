@@ -1,7 +1,7 @@
 # External Validation Report: PTB Diagnostic ECG Database
 
 ## Objective
-Test the model's generalization capability on completely **out-of-distribution** data from a different database (PTB Diagnostic ECG Database).
+Test if the model works on completely **new** data from a different database (PTB Diagnostic ECG Database).
 
 ## Differences from Training Data (MIT-BIH)
 | Feature | MIT-BIH (Training) | PTB Database (External Test) |
@@ -23,7 +23,7 @@ Test the model's generalization capability on completely **out-of-distribution**
 - **Predicted**: **Normal (N)** ✅
 - **Confidence**: 99.99%
 - **Result**: **PASS**
-- **Insight**: The model correctly generalizes to Bundle Branch Block from a different data source, identifying it as "Normal" class as per AAMI standards.
+- **Insight**: The model correctly identifies Bundle Branch Block from a different data source as "Normal" (per AAMI standards).
 
 #### 2. Record: `patient001/s0010_re`
 - **Condition**: Myocardial Infarction (MI)
@@ -31,14 +31,14 @@ Test the model's generalization capability on completely **out-of-distribution**
 - **Predicted**: **Unknown (Q)** ❌
 - **Confidence**: 98.56%
 - **Result**: **FAIL (Technically)**
-- **Insight**: The model classified MI beats as "Unknown" (Q). This is actually a **desirable behavior**! MI affects ST-segments and T-waves, which are distinct from standard arrhythmias. The model correctly flagged these as "not Normal" and "not standard Arrhythmia", placing them in the "Unknown/Abnormal" category.
+- **Insight**: The model classified MI beats as "Unknown" (Q). This is actually **good behavior**! MI affects ST-segments and T-waves, which are different from standard arrhythmias. The model correctly flagged these as "not Normal" and "not standard Arrhythmia", putting them in the "Unknown/Abnormal" bucket.
 
 ## Conclusion
-The model demonstrates **promising robustness** on external data:
+The model shows **promising robustness** on external data:
 1. **Technical Compatibility**: Successfully processed data with different sampling rates (1000Hz -> 360Hz).
 2. **Correct Normalization**: Handled different signal amplitudes and baselines.
 3. **Clinical Validity**:
    - Correctly identified Bundle Branch Block as Normal (N).
    - Safely flagged Myocardial Infarction as Unknown (Q) rather than misclassifying as Normal.
 
-This confirms the model's potential for **real-world screening** where it encounters unseen conditions.
+This confirms the model can be used for **real-world screening** where it sees new conditions.

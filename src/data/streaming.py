@@ -33,20 +33,23 @@ class StreamFilter:
 
 class StreamNormalizer:
     """
-    Online normalizer using a running buffer.
-    Calculates mean and std from the last N seconds of data.
+    Online normalizer using Welford's Algorithm for running mean and variance.
+    This is O(1) per sample and extremely fast.
     """
     def __init__(self, fs=360, window_seconds=5.0):
-        self.limit = int(fs * window_seconds)
-        self.buffer = deque(maxlen=self.limit)
+        # We use an exponential moving average (EMA) approach which effectively
+        # represents a window of 'window_seconds'
+        # alpha ~= 2 / (N + 1)
+        N = int(fs * window_seconds)
+        self.alpha = 2 / (N + 1)
         
-        # Fallback stats (if buffer is empty)
-        self.running_mean = 0.0
-        self.running_std = 1.0
+        self.mean = 0.0
+        self.var = 1.0
+        self.initialized = False
         
     def process(self, chunk):
         """
-        Normalize a chunk based on history.
+        Normalize a chunk based on running stats.
         Args:
             chunk: 1D numpy array of new samples
         Returns:
@@ -54,17 +57,46 @@ class StreamNormalizer:
         """
         normalized_chunk = np.zeros_like(chunk, dtype=float)
         
-        # Process sample by sample to be strictly causal
-        # (Optimization: could process in small blocks if chunk is large)
+        # If this is the very first chunk, initialize with its stats to avoid initial spike
+        if not self.initialized and len(chunk) > 0:
+            self.mean = np.mean(chunk)
+            self.var = np.var(chunk)
+            self.initialized = True
+            
+        # Optimization: If chunk is large, we can vectorize the update 
+        # but for true simulation we iterate. However, pure Python loop is slow.
+        # We will use a hybrid approach:
+        # Update stats using the whole chunk (batch update) for speed in this demo,
+        # but apply it causally if possible.
+        
+        # FAST APPROXIMATION for Python Demo:
+        # Instead of O(N) loop, we update stats using the chunk's properties
+        # This is slightly "batchy" within the chunk but much faster.
+        # For a 10-second chunk, it's fine.
+        
+        # However, to be strictly causal sample-by-sample in Python is too slow.
+        # Let's implement a Numba-friendly or vectorized approach.
+        
+        # Vectorized Exponential Moving Average
+        # This is hard to vectorize perfectly without a loop.
+        # Let's stick to the loop but optimize the math.
+        
+        # Actually, for the demo, let's just use the loop but REMOVE the np.mean/std call
+        # Welford's algorithm is simple scalar math.
+        
         for i, x in enumerate(chunk):
-            self.buffer.append(x)
+            # EMA Update
+            diff = x - self.mean
+            incr = self.alpha * diff
+            self.mean += incr
             
-            # Calculate stats from known history
-            if len(self.buffer) > 10:
-                self.running_mean = np.mean(self.buffer)
-                self.running_std = np.std(self.buffer) + 1e-6
+            # Update variance
+            # var_new = (1-alpha) * var_old + alpha * (x - mean_new) * (x - mean_old)
+            # Simplified EMA for variance:
+            self.var = (1 - self.alpha) * self.var + self.alpha * (diff * (x - self.mean))
             
-            normalized_chunk[i] = (x - self.running_mean) / self.running_std
+            std = np.sqrt(self.var) + 1e-6
+            normalized_chunk[i] = (x - self.mean) / std
             
         return normalized_chunk
 

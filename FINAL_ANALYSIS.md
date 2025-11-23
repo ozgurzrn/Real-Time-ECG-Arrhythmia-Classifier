@@ -47,7 +47,7 @@ N=1.0, S=5.0, V=5.0, F=3.0, Q=2.0
 2. ❌ **Individual Patient Generalization**: Model struggles with patient-specific patterns
 3. ❌ **V/S Detection**: Still misclassified on individual patient records
 
-###Root Cause: Data Distribution Mismatch
+### Root Cause: Data Distribution Mismatch
 
 **The Problem:**
 - **Training**: Randomly mixed beats from all 48 patients
@@ -61,7 +61,7 @@ Training on "average human" data from 100 people, then testing on one person wit
 
 ## Why Class Weights Didn't Help
 
-Class weights address **label imbalance** in training, but the core issue is **distribution shift** between:
+Class weights fix **label imbalance** in training, but the real issue is **distribution shift** between:
 
 1. **Training Distribution**: Mixed population data
    - Beat 1: Patient A (Normal)
@@ -134,7 +134,7 @@ Despite validation limitations, the model excels at:
 - ❌ **Sole diagnostic tool** - Not recommended
 
 ### For Portfolio:
-- ✅ **Demonstrates full ML pipeline**
+- ✅ **Shows full ML pipeline**
 - ✅ **Shows validation rigor**
 - ✅ **Honest about limitations**
 - ✅ **Production-quality code**
@@ -187,7 +187,7 @@ However, comprehensive validation revealed a fundamental limitation: **poor gene
 
 This limitation is due to **data distribution mismatch** between training (population-level) and validation (patient-level), not model architecture or hyperparameters.
 
-**This makes it a stronger portfolio piece** because it demonstrates:
+**This makes it a stronger portfolio piece** because it shows:
 - Real validation methodology
 - Understanding of ML limitations
 - Honest assessment of performance

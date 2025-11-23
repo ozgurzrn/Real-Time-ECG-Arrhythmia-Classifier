@@ -32,6 +32,9 @@ wheels/
 # Data & Models (too large for GitHub)
 data/raw/
 data/processed/
+data/external/shayan/
+data/external/*.csv
+data/external/*.zip
 *.npy
 *.dat
 *.hea
@@ -61,3 +64,7 @@ Thumbs.db
 
 # Sample files (keep one for demo)
 !sample_input.csv
+
+# Agent Artifacts
+.gemini/
+.agent/

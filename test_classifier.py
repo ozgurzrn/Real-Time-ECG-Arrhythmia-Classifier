@@ -13,7 +13,9 @@ import numpy as np
 import wfdb
 from pathlib import Path
 import sys
+import torch
 sys.path.append('src')
+from model.model import ResNet1D
 
 # Test cases: (record_number, description, expected_dominant_class)
 TEST_CASES = [
