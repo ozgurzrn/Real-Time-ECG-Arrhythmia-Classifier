@@ -1,0 +1,394 @@
+2025-11-23 14:50:23.080 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.081 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.237 
+  Warning: to view this Streamlit app on a browser, run it with the following
+  command:
+
+    streamlit run test_classifier.py [ARGUMENTS]
+2025-11-23 14:50:23.237 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.237 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.238 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.238 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.238 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.238 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.410 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-11-23 14:50:23.412 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+======================================================================
+ECG Arrhythmia Classifier - Comprehensive Test Suite
+======================================================================
+
+­şôü Creating test samples...
+Ô£ô Created test_samples/record_100.csv
+Ô£ô Created test_samples/record_101.csv
+Ô£ô Created test_samples/record_106.csv
+Ô£ô Created test_samples/record_119.csv
+Ô£ô Created test_samples/record_200.csv
+Ô£ô Created test_samples/record_209.csv
+Ô£ô Created test_samples/record_220.csv
+Ô£ô Created test_samples/record_102.csv
+Ô£ô Created test_samples/record_104.csv
+Ô£ô Created test_samples/record_207.csv
+Ô£ô Created test_samples/record_208.csv
+
+­şğ¬ Running tests on 11 records...
+
+
+======================================================================
+Testing Record 100: Normal with PVCs
+Expected dominant: N
+======================================================================
+
+­şôè Results (54 beats classified):
+  ­şæë N:   35 ( 64.8%)
+     S:    1 (  1.9%)
+     Q:   18 ( 33.3%)
+
+­şöı Signal Quality:
+  Overall: Poor (10/100)
+  SNR: 0.2 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: YES (35 spikes, 95% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 111 bpm (Tachycardia)
+  Regularity: Irregular (CV=0.32)
+  Pattern: Possible Bigeminy
+  Clinical: Irregular rhythm detected (CV=0.32) | Tachycardia: 111 bpm | Alternating RR pattern suggests ventricular bigeminy
+
+­şÆ» Confidence:
+  Average: 99.86%
+  Low confidence (<60%): 0/54
+
+Ô£à PASS - Predicted: N, Expected: N
+
+======================================================================
+Testing Record 101: Sinus rhythm with rare PVCs
+Expected dominant: N
+======================================================================
+
+­şôè Results (38 beats classified):
+  ­şæë N:   33 ( 86.8%)
+     Q:    5 ( 13.2%)
+
+­şöı Signal Quality:
+  Overall: Poor (10/100)
+  SNR: 0.5 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: YES (34 spikes, 100% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 79 bpm (Normal)
+  Regularity: Regular (CV=0.26)
+  Pattern: Mildly Irregular
+  Clinical: Regular sinus rhythm
+
+­şÆ» Confidence:
+  Average: 100.00%
+  Low confidence (<60%): 0/38
+
+Ô£à PASS - Predicted: N, Expected: N
+
+======================================================================
+Testing Record 106: Frequent PVCs and ventricular bigeminy
+Expected dominant: V
+======================================================================
+
+­şôè Results (35 beats classified):
+     N:   34 ( 97.1%)
+     Q:    1 (  2.9%)
+
+­şöı Signal Quality:
+  Overall: Poor (30/100)
+  SNR: 0.2 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: NO
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 73 bpm (Normal)
+  Regularity: Regular (CV=0.17)
+  Pattern: Mildly Irregular
+  Clinical: Regular sinus rhythm
+
+­şÆ» Confidence:
+  Average: 100.00%
+  Low confidence (<60%): 0/35
+
+ÔØî FAIL - Predicted: N, Expected: V
+
+======================================================================
+Testing Record 119: Frequent PVCs
+Expected dominant: V
+======================================================================
+
+­şôè Results (36 beats classified):
+     N:   26 ( 72.2%)
+  ­şæë V:    8 ( 22.2%)
+     Q:    2 (  5.6%)
+
+­şöı Signal Quality:
+  Overall: Poor (30/100)
+  SNR: 0.4 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: NO
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 73 bpm (Normal)
+  Regularity: Irregular (CV=0.31)
+  Pattern: Possible Bigeminy
+  Clinical: Irregular rhythm detected (CV=0.31) | Alternating RR pattern suggests ventricular bigeminy
+
+­şÆ» Confidence:
+  Average: 98.62%
+  Low confidence (<60%): 1/36
+
+ÔØî FAIL - Predicted: N, Expected: V
+
+======================================================================
+Testing Record 200: Atrial premature beats
+Expected dominant: S
+======================================================================
+
+­şôè Results (47 beats classified):
+     N:   28 ( 59.6%)
+     V:    4 (  8.5%)
+     Q:   15 ( 31.9%)
+
+­şöı Signal Quality:
+  Overall: Fair (48/100)
+  SNR: 0.1 dB
+  Artifacts: 45/100
+
+­şöï Pacemaker: YES (14 spikes, 32% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 95 bpm (Normal)
+  Regularity: Regular (CV=0.15)
+  Pattern: Possible Bigeminy
+  Clinical: Alternating RR pattern suggests ventricular bigeminy
+
+­şÆ» Confidence:
+  Average: 99.96%
+  Low confidence (<60%): 0/47
+
+ÔØî FAIL - Predicted: N, Expected: S
+
+======================================================================
+Testing Record 209: Atrial fibrillation
+Expected dominant: S
+======================================================================
+
+­şôè Results (46 beats classified):
+     N:   46 (100.0%)
+
+­şöı Signal Quality:
+  Overall: Poor (10/100)
+  SNR: 0.3 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: YES (12 spikes, 26% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 94 bpm (Normal)
+  Regularity: Regular (CV=0.06)
+  Pattern: Regular Rhythm
+  Clinical: Regular sinus rhythm
+
+­şÆ» Confidence:
+  Average: 100.00%
+  Low confidence (<60%): 0/46
+
+ÔØî FAIL - Predicted: N, Expected: S
+
+======================================================================
+Testing Record 220: Normal with occasional PVCs
+Expected dominant: N
+======================================================================
+
+­şôè Results (40 beats classified):
+  ­şæë N:   35 ( 87.5%)
+     Q:    5 ( 12.5%)
+
+­şöı Signal Quality:
+  Overall: Poor (30/100)
+  SNR: 0.1 dB
+  Artifacts: 80/100
+
+­şöï Pacemaker: YES (21 spikes, 58% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 82 bpm (Normal)
+  Regularity: Regular (CV=0.24)
+  Pattern: Mildly Irregular
+  Clinical: Regular sinus rhythm
+
+­şÆ» Confidence:
+  Average: 100.00%
+  Low confidence (<60%): 0/40
+
+Ô£à PASS - Predicted: N, Expected: N
+
+======================================================================
+Testing Record 102: Paced rhythm
+Expected dominant: Q
+======================================================================
+
+­şôè Results (48 beats classified):
+  ­şæë Q:   48 (100.0%)
+
+­şöı Signal Quality:
+  Overall: Poor (18/100)
+  SNR: 0.4 dB
+  Artifacts: 65/100
+
+­şöï Pacemaker: YES (36 spikes, 100% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 97 bpm (Normal)
+  Regularity: Irregular (CV=0.32)
+  Pattern: Highly Irregular (possible AF)
+  Clinical: Irregular rhythm detected (CV=0.32)
+
+­şÆ» Confidence:
+  Average: 100.00%
+  Low confidence (<60%): 0/48
+
+Ô£à PASS - Predicted: Q, Expected: Q
+
+======================================================================
+Testing Record 104: Paced rhythm
+Expected dominant: Q
+======================================================================
+
+­şôè Results (60 beats classified):
+  ­şæë Q:   60 (100.0%)
+
+­şöı Signal Quality:
+  Overall: Poor (35/100)
+  SNR: 1.0 dB
+  Artifacts: 30/100
+
+­şöï Pacemaker: YES (40 spikes, 100% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 121 bpm (Tachycardia)
+  Regularity: Irregular (CV=0.31)
+  Pattern: Highly Irregular (possible AF)
+  Clinical: Irregular rhythm detected (CV=0.31) | Tachycardia: 121 bpm
+
+­şÆ» Confidence:
+  Average: 99.94%
+  Low confidence (<60%): 0/60
+
+Ô£à PASS - Predicted: Q, Expected: Q
+
+======================================================================
+Testing Record 207: Ventricular bigeminy
+Expected dominant: V
+======================================================================
+
+­şôè Results (55 beats classified):
+     N:   14 ( 25.5%)
+  ­şæë V:   14 ( 25.5%)
+     Q:   27 ( 49.1%)
+
+­şöı Signal Quality:
+  Overall: Poor (35/100)
+  SNR: 1.2 dB
+  Artifacts: 30/100
+
+­şöï Pacemaker: YES (18 spikes, 69% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 112 bpm (Tachycardia)
+  Regularity: Regular (CV=0.20)
+  Pattern: Mildly Irregular
+  Clinical: Tachycardia: 112 bpm
+
+­şÆ» Confidence:
+  Average: 99.19%
+  Low confidence (<60%): 0/55
+
+ÔØî FAIL - Predicted: Q, Expected: V
+
+======================================================================
+Testing Record 208: Mixed ventricular and supraventricular
+Expected dominant: V
+======================================================================
+
+­şôè Results (50 beats classified):
+     N:   24 ( 48.0%)
+  ­şæë V:   21 ( 42.0%)
+     F:    5 ( 10.0%)
+
+­şöı Signal Quality:
+  Overall: Poor (30/100)
+  SNR: 1.1 dB
+  Artifacts: 40/100
+
+­şöï Pacemaker: YES (29 spikes, 83% confidence)
+
+­şÆô Rhythm Analysis:
+  Heart Rate: 103 bpm (Tachycardia)
+  Regularity: Regular (CV=0.21)
+  Pattern: Mildly Irregular
+  Clinical: Tachycardia: 103 bpm
+
+­şÆ» Confidence:
+  Average: 97.13%
+  Low confidence (<60%): 1/50
+
+ÔØî FAIL - Predicted: N, Expected: V
+
+======================================================================
+SUMMARY
+======================================================================
+
+Overall Accuracy: 5/11 (45.5%)
+
+­şôï Detailed Results:
+Record   Expected   Predicted  Match    Beats    Confidence   Quality     
+------------------------------------------------------------------------------------------
+100      N          N          Ô£à        54            99.9%  Poor        
+101      N          N          Ô£à        38           100.0%  Poor        
+106      V          N          ÔØî        35           100.0%  Poor        
+119      V          N          ÔØî        36            98.6%  Poor        
+200      S          N          ÔØî        47           100.0%  Fair        
+209      S          N          ÔØî        46           100.0%  Poor        
+220      N          N          Ô£à        40           100.0%  Poor        
+102      Q          Q          Ô£à        48           100.0%  Poor        
+104      Q          Q          Ô£à        60            99.9%  Poor        
+207      V          Q          ÔØî        55            99.2%  Poor        
+208      V          N          ÔØî        50            97.1%  Poor        
+
+======================================================================
+Test suite completed: 5/11 tests passed
+======================================================================

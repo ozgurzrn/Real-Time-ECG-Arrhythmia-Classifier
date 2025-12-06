@@ -1,0 +1,7 @@
+venv/
+.venv_gpu/
+__pycache__/
+data/
+*.pyc
+*.csv
+.env

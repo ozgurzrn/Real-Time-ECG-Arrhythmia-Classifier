@@ -1,0 +1,14 @@
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+plotly
+scikit-learn
+imbalanced-learn
+wfdb
+streamlit
+torch
+shap
+reportlab
+PyWavelets
